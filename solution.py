@@ -63,6 +63,15 @@ def eliminate(values):
     """
     # TODO: Copy your code from the classroom to complete this function
     raise NotImplementedError
+    for i in range(1):
+
+    for box in values:
+        if (len(values[box]) == 1 ):
+            for p_box in peers[box]:
+                if (len(values[p_box])!= 1):
+                    values[p_box] = values[p_box].replace(values[box], "")
+
+    return values
 
 
 def only_choice(values):
