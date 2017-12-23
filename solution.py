@@ -42,7 +42,46 @@ def naked_twins(values):
     strategy repeatedly).
     """
     # TODO: Implement this function!
-    raise NotImplementedError
+    #raise NotImplementedError
+    for unit in unitlist:
+        #print(unit)
+        len_2 = {}
+        box_name = []
+        box_val = []
+        for box in unit:
+            if(len(values[box]))==2:
+                box_name.append(box)
+                box_val.append(values[box])
+                len_2[box] = values[box]
+        #print(len_2)
+        #print(box_name)
+        #print(box_val)
+
+        pos = 1
+        while pos < (len(box_val)):
+            if box_val[0]==box_val[pos]:
+                #print("twins")
+                for box2 in unit:
+                    #print("box2",box2, values[box2])
+                    if len(values[box2])>2:
+                        #print(">2")
+
+                        for c in box_val[0]:
+                            if c in values[box2]:
+
+                                #print(box2, values[box2])
+                                #print("remove", c)
+                                values[box2] = values[box2].replace(c, "")
+                                #print(box2, values[box2])
+
+                pos = pos + 1
+            else:
+                pos = pos + 1
+
+    #print("***")
+    return(values)
+
+
 
 
 def eliminate(values):
@@ -62,14 +101,13 @@ def eliminate(values):
         The values dictionary with the assigned values eliminated from peers
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+    #raise NotImplementedError
     for i in range(1):
-
-    for box in values:
-        if (len(values[box]) == 1 ):
-            for p_box in peers[box]:
-                if (len(values[p_box])!= 1):
-                    values[p_box] = values[p_box].replace(values[box], "")
+        for box in values:
+            if (len(values[box]) == 1 ):
+                for p_box in peers[box]:
+                    if (len(values[p_box])!= 1):
+                        values[p_box] = values[p_box].replace(values[box], "")
 
     return values
 
@@ -95,8 +133,8 @@ def only_choice(values):
     You should be able to complete this function by copying your code from the classroom
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
-        for unit in units:
+    #raise NotImplementedError
+    for unit in units:
 
         for item in units[unit]:
             digit_counter = {}
@@ -136,7 +174,31 @@ def reduce_puzzle(values):
         no longer produces any changes, or False if the puzzle is unsolvable
     """
     # TODO: Copy your code from the classroom and modify it to complete this function
-    raise NotImplementedError
+    #raise NotImplementedError
+    stalled = False
+    while not stalled:
+        # Check how many boxes have a determined value
+        solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
+
+        # Your code here: Use the Eliminate Strategy
+        eliminate(values)
+
+        # Your code here: Use the Only Choice Strategy
+        only_choice(values)
+
+        #Call function naked_twins
+        naked_twins(values)
+
+        # Check how many boxes have a determined value, to compare
+        solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+
+        # If no new values were added, stop the loop.
+        stalled = solved_values_before == solved_values_after
+
+        # Sanity check, return False if there is a box with zero available values:
+        if len([box for box in values.keys() if len(values[box]) == 0]):
+            return False
+    return values
 
 
 def search(values):
@@ -159,7 +221,22 @@ def search(values):
     and extending it to call the naked twins strategy.
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+    #raise NotImplementedError
+    # First, reduce the puzzle using the previous function
+    values = reduce_puzzle(values)
+    if values is False:
+        return False ## Failed earlier
+    if all(len(values[s]) == 1 for s in boxes):
+        return values ## Solved!
+    # Choose one of the unfilled squares with the fewest possibilities
+    n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
+    # Now use recurrence to solve each one of the resulting sudokus, and
+    for value in values[s]:
+        new_sudoku = values.copy()
+        new_sudoku[s] = value
+        attempt = search(new_sudoku)
+        if attempt:
+            return attempt
 
 
 def solve(grid):
